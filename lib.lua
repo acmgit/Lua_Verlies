@@ -64,13 +64,14 @@ function lib.prepare_dungeon(dim)
 
 end
 
+-- Gives the <name> Tile back
 function lib.get_tile(name)
 
     local tiles = { "#",  -- Wall
                     " ",  -- Floor 
                     "<",  -- Entry
                     ">",  -- Exit
-                    "d",  -- Door
+                    "h",  -- Hall
                     "r",  -- Room
                     "v",  -- Visited
 
@@ -80,7 +81,7 @@ function lib.get_tile(name)
                     ["floor"] = tiles[2],
                     ["entry"] = tiles[3],
                     ["exit"] = tiles[4],
-                    ["door"] = tiles[5],
+                    ["hall"] = tiles[5],
                     ["room"] = tiles[6],
                     ["visited"] = tiles[7],
 
@@ -90,14 +91,21 @@ function lib.get_tile(name)
 
 end
 
+-- Calculates a random direction
 function lib.get_direction()
     local dir = (math.random(1,100) % d.directions)+1   
     return dir 
 
 end
 
+-- Check if it's floor on position line, column
 function lib.is_floor(line, column)
     local check = false
+
+    if(not line) or (not column) then
+        return check
+
+    end
 
     if(lib.check_dimension(line,column)) then
         if(d.raw_dungeon[line][column] == lib.get_tile("floor")) then
@@ -162,7 +170,21 @@ function lib.set_out()
 
 end
 
-function lib.set_rooms()
+function lib.set_rooms(level, tile, rooms)
+        for r = 1, rooms do
+            local rm = {}
+            
+            repeat
+                rm[r] = {x = math.random(2, d.dim.x - 1)}
+                rm[r] = {y = math.random(2, d.dim.y - 1)}
+                print(rm[r].y, rm[r].x)
+
+            until (not lib.check_dimension(rm[r].y, rm[r].x)) or (not lib.is_floor(rm[r].y,rm[r].x))
+            
+            d.raw_dungeon[rm[r].y][rm[r].x] = tile
+            d.room[level] = rm[r]
+
+        end
 
 end
 
